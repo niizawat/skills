@@ -1,13 +1,13 @@
-# テストパターン・ベストプラクティス
+# Testing Patterns and Best Practices
 
-## 目次
+## Table of Contents
 
-1. [テスト環境セットアップ](#テスト環境セットアップ)
-2. [コンポーネントテスト](#コンポーネントテスト)
-3. [モックパターン](#モックパターン)
-4. [統合テスト](#統合テスト)
+1. [Test Environment Setup](#test-environment-setup)
+2. [Component Testing](#component-testing)
+3. [Mock Patterns](#mock-patterns)
+4. [Integration Testing](#integration-testing)
 
-## テスト環境セットアップ
+## Test Environment Setup
 
 ### Vitest + happy-dom
 
@@ -52,9 +52,9 @@ describe("Select", () => {
 });
 ```
 
-## コンポーネントテスト
+## Component Testing
 
-### 基本パターン
+### Basic Pattern
 
 ```typescript
 import { render } from "ink-testing-library";
@@ -75,7 +75,7 @@ describe("Header", () => {
 });
 ```
 
-### キー入力テスト
+### Key Input Testing
 
 ```typescript
 import { render } from "ink-testing-library";
@@ -91,13 +91,13 @@ describe("Select", () => {
       <Select items={items} onSelect={vi.fn()} />
     );
 
-    // 初期状態
+    // Initial state
     expect(lastFrame()).toContain("› Item 1");
 
-    // j キーで下に移動
+    // Press j key to move down
     stdin.write("j");
 
-    // 選択が移動したことを確認
+    // Verify selection moved
     expect(lastFrame()).toContain("› Item 2");
   });
 
@@ -116,7 +116,7 @@ describe("Select", () => {
 });
 ```
 
-### 非同期テスト
+### Async Testing
 
 ```typescript
 import { render } from "ink-testing-library";
@@ -136,19 +136,19 @@ describe("LoadingIndicator", () => {
       <LoadingIndicator isLoading={true} delay={300} />
     );
 
-    // 初期状態では表示されない
+    // Not displayed initially
     expect(lastFrame()).toBe("");
 
-    // 300ms 後に表示
+    // Displayed after 300ms
     vi.advanceTimersByTime(300);
     expect(lastFrame()).toContain("Loading");
   });
 });
 ```
 
-## モックパターン
+## Mock Patterns
 
-### 外部依存のモック
+### Mocking External Dependencies
 
 ```typescript
 vi.mock("../../../git.js", () => ({
@@ -158,12 +158,12 @@ vi.mock("../../../git.js", () => ({
 }));
 ```
 
-### Screenコンポーネントのモック
+### Mocking Screen Components
 
-テスト対象以外のScreenをモック化:
+Mock Screens other than the test target:
 
 ```typescript
-// Props をキャプチャするための配列
+// Array to capture props
 const capturedProps: BranchListScreenProps[] = [];
 
 vi.mock("../../components/screens/BranchListScreen.js", () => ({
@@ -175,7 +175,7 @@ vi.mock("../../components/screens/BranchListScreen.js", () => ({
 
 describe("App", () => {
   beforeEach(() => {
-    capturedProps.length = 0;  // リセット
+    capturedProps.length = 0;  // Reset
   });
 
   it("should pass branches to BranchListScreen", async () => {
@@ -190,7 +190,7 @@ describe("App", () => {
 });
 ```
 
-### フックのモック
+### Mocking Hooks
 
 ```typescript
 vi.mock("../../hooks/useGitData.js", () => ({
@@ -206,7 +206,7 @@ vi.mock("../../hooks/useGitData.js", () => ({
 }));
 ```
 
-### 条件付きモック応答
+### Conditional Mock Responses
 
 ```typescript
 const mockGetBranches = vi.fn();
@@ -219,7 +219,7 @@ describe("useGitData", () => {
   it("should handle error", async () => {
     mockGetBranches.mockRejectedValueOnce(new Error("Git error"));
 
-    // エラーが設定されることを確認
+    // Verify error is set
   });
 
   it("should return branches", async () => {
@@ -227,29 +227,29 @@ describe("useGitData", () => {
       { name: "main" },
     ]);
 
-    // ブランチが返されることを確認
+    // Verify branches are returned
   });
 });
 ```
 
-## 統合テスト
+## Integration Testing
 
-### ナビゲーションテスト
+### Navigation Testing
 
 ```typescript
 describe("Navigation", () => {
   it("should navigate from branch list to action selector", async () => {
     const { stdin, lastFrame } = render(<App />);
 
-    // ブランチリストが表示されるのを待つ
+    // Wait for branch list to display
     await waitFor(() => {
       expect(lastFrame()).toContain("Branch List");
     });
 
-    // Enter で選択
+    // Select with Enter
     stdin.write("\r");
 
-    // アクションセレクタに遷移
+    // Navigate to action selector
     await waitFor(() => {
       expect(lastFrame()).toContain("Action Selector");
     });
@@ -258,13 +258,13 @@ describe("Navigation", () => {
   it("should go back on Escape", async () => {
     const { stdin, lastFrame } = render(<App />);
 
-    // 遷移
+    // Navigate
     stdin.write("\r");
     await waitFor(() => {
       expect(lastFrame()).toContain("Action Selector");
     });
 
-    // Escape で戻る
+    // Go back with Escape
     stdin.write("\x1B");  // Escape key
 
     await waitFor(() => {
@@ -274,7 +274,7 @@ describe("Navigation", () => {
 });
 ```
 
-### エッジケーステスト
+### Edge Case Testing
 
 ```typescript
 describe("Edge Cases", () => {
@@ -296,13 +296,13 @@ describe("Edge Cases", () => {
       <Select items={items} onSelect={vi.fn()} />
     );
 
-    // 表示が壊れていないことを確認
+    // Verify display is not broken
     expect(lastFrame()).toBeDefined();
   });
 });
 ```
 
-### パフォーマンステスト
+### Performance Testing
 
 ```typescript
 describe("Performance", () => {
@@ -318,22 +318,22 @@ describe("Performance", () => {
       <Select items={items} onSelect={vi.fn()} limit={20} />
     );
 
-    // 100回の移動
+    // 100 movements
     for (let i = 0; i < 100; i++) {
       stdin.write("j");
     }
 
     const duration = performance.now() - start;
 
-    // 1秒以内に完了すること
+    // Should complete within 1 second
     expect(duration).toBeLessThan(1000);
   });
 });
 ```
 
-## テストユーティリティ
+## Test Utilities
 
-### waitFor ヘルパー
+### waitFor Helper
 
 ```typescript
 async function waitFor(
@@ -346,7 +346,7 @@ async function waitFor(
     try {
       if (condition()) return;
     } catch {
-      // 条件が満たされない
+      // Condition not met
     }
     await new Promise((r) => setTimeout(r, 10));
   }
@@ -355,7 +355,7 @@ async function waitFor(
 }
 ```
 
-### テスト用のキー定数
+### Key Constants for Testing
 
 ```typescript
 const KEYS = {

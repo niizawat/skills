@@ -1,33 +1,33 @@
-# カスタムフック設計ガイド
+# Custom Hooks Design Guide
 
-## 目次
+## Table of Contents
 
-1. [設計原則](#設計原則)
+1. [Design Principles](#design-principles)
 2. [useScreenState](#usescreenstate)
 3. [useTerminalSize](#useterminalsize)
-4. [useGitData（データ取得パターン）](#usegitdata)
-5. [useInput活用パターン](#useinput活用パターン)
+4. [useGitData (Data Fetching Pattern)](#usegitdata)
+5. [useInput Patterns](#useinput-patterns)
 
-## 設計原則
+## Design Principles
 
-### 単一責務
+### Single Responsibility
 
-各フックは1つの関心事のみを担当する。
+Each hook handles only one concern.
 
 ```typescript
-// Good: 単一責務
-function useScreenState() { ... }  // 画面遷移のみ
-function useTerminalSize() { ... } // サイズ監視のみ
+// Good: Single responsibility
+function useScreenState() { ... }  // Screen navigation only
+function useTerminalSize() { ... } // Size monitoring only
 
-// Bad: 複数の責務
+// Bad: Multiple responsibilities
 function useAppState() {
-  // 画面遷移、データ取得、ターミナルサイズ...
+  // Screen navigation, data fetching, terminal size...
 }
 ```
 
-### 戻り値オブジェクト
+### Return Value Object
 
-関連する状態と関数をオブジェクトでまとめて返す。
+Return related state and functions together as an object.
 
 ```typescript
 interface UseGitDataResult {
@@ -43,38 +43,38 @@ function useGitData(): UseGitDataResult {
 }
 ```
 
-### クリーンアップ
+### Cleanup
 
-`useEffect`内で必ずクリーンアップ関数を返す。
+Always return a cleanup function from `useEffect`.
 
 ```typescript
 useEffect(() => {
   const handler = () => { ... };
   process.stdout.on("resize", handler);
 
-  // クリーンアップ
+  // Cleanup
   return () => {
     process.stdout.removeListener("resize", handler);
   };
 }, []);
 ```
 
-### 依存配列の正確性
+### Dependency Array Accuracy
 
-`useCallback`/`useEffect`/`useMemo`の依存配列を正確に指定する。
+Specify dependency arrays accurately for `useCallback`/`useEffect`/`useMemo`.
 
 ```typescript
 const loadData = useCallback(async () => {
   setLoading(true);
-  const data = await fetchData(options);  // options を使用
+  const data = await fetchData(options);  // uses options
   setData(data);
   setLoading(false);
-}, [options]);  // options を依存に含める
+}, [options]);  // include options in dependencies
 ```
 
 ## useScreenState
 
-スタック型の画面ナビゲーション管理。
+Stack-based screen navigation management.
 
 ```typescript
 import { useState, useCallback } from "react";
@@ -101,7 +101,7 @@ export function useScreenState(): ScreenStateResult {
   const goBack = useCallback(() => {
     setHistory((prev) => {
       if (prev.length <= 1) {
-        return prev;  // 初期画面から戻れない
+        return prev;  // Cannot go back from initial screen
       }
       return prev.slice(0, -1);
     });
@@ -120,7 +120,7 @@ export function useScreenState(): ScreenStateResult {
 }
 ```
 
-### 使用例
+### Usage Example
 
 ```typescript
 function App() {
@@ -155,9 +155,9 @@ function App() {
 
 ## useTerminalSize
 
-ターミナルサイズの取得とリサイズ監視。
+Get terminal size and monitor resize events.
 
-> **注**: CI/テスト環境など非TTY環境では`process.stdout.rows`/`columns`が`undefined`になります。必ずフォールバック値を設定してください。また、`process.stdout.isTTY`でTTY判定を行い、非TTY環境ではリサイズイベントをスキップすることを推奨します。
+> **Note**: In non-TTY environments such as CI/test environments, `process.stdout.rows`/`columns` may be `undefined`. Always set fallback values. It's recommended to use `process.stdout.isTTY` for TTY detection and skip resize events in non-TTY environments.
 
 ```typescript
 import { useState, useEffect } from "react";
@@ -191,13 +191,13 @@ export function useTerminalSize(): TerminalSize {
 }
 ```
 
-### 使用例
+### Usage Example
 
 ```typescript
 function BranchListScreen() {
   const { rows, columns } = useTerminalSize();
 
-  // 動的に表示行数を計算
+  // Calculate display rows dynamically
   const headerHeight = 2;
   const footerHeight = 1;
   const availableRows = rows - headerHeight - footerHeight;
@@ -214,7 +214,7 @@ function BranchListScreen() {
 
 ## useGitData
 
-非同期データ取得とキャッシュのパターン。
+Pattern for async data fetching and caching.
 
 ```typescript
 import { useState, useCallback, useEffect } from "react";
@@ -252,7 +252,7 @@ export function useGitData(
     setError(null);
 
     try {
-      // 並列でデータ取得
+      // Fetch data in parallel
       const [branchData, worktreeData] = await Promise.all([
         fetchBranches(),
         fetchWorktrees(),
@@ -268,12 +268,12 @@ export function useGitData(
     }
   }, []);
 
-  // 初回ロード
+  // Initial load
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  // 自動リフレッシュ
+  // Auto refresh
   useEffect(() => {
     if (!enableAutoRefresh) return;
 
@@ -292,9 +292,9 @@ export function useGitData(
 }
 ```
 
-### キャンセルパターン
+### Cancellation Pattern
 
-コンポーネントがアンマウントされた後のstate更新を防ぐ:
+Prevent state updates after component unmounts:
 
 ```typescript
 const loadData = useCallback(async () => {
@@ -324,9 +324,9 @@ const loadData = useCallback(async () => {
 }, []);
 ```
 
-## useInput活用パターン
+## useInput Patterns
 
-### 基本パターン
+### Basic Pattern
 
 ```typescript
 import { useInput } from "ink";
@@ -349,33 +349,33 @@ function MyComponent() {
 }
 ```
 
-### 条件付きハンドリング
+### Conditional Handling
 
 ```typescript
 function MyComponent({ disabled, mode }: Props) {
   useInput((input, key) => {
-    // 無効化時は何もしない
+    // Do nothing when disabled
     if (disabled) return;
 
-    // モードによって処理を分岐
+    // Branch processing by mode
     if (mode === "edit") {
-      // 編集モードの処理
+      // Edit mode processing
     } else {
-      // 通常モードの処理
+      // Normal mode processing
     }
   });
 }
 ```
 
-### グローバルショートカット
+### Global Shortcuts
 
 ```typescript
 function App() {
   const [filterMode, setFilterMode] = useState(false);
 
-  // グローバルショートカット（フィルターモード以外で有効）
+  // Global shortcuts (active except during filter mode)
   useInput((input, key) => {
-    if (filterMode) return;  // フィルター入力中は無効
+    if (filterMode) return;  // Disable during filter input
 
     switch (input) {
       case "q":
@@ -401,7 +401,7 @@ function App() {
 }
 ```
 
-### スピナーアニメーション
+### Spinner Animation
 
 ```typescript
 const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧"];
@@ -424,7 +424,7 @@ function useSpinner(isActive: boolean) {
   return SPINNER_FRAMES[frameIndex];
 }
 
-// 使用
+// Usage
 function LoadingIndicator({ loading }: { loading: boolean }) {
   const frame = useSpinner(loading);
 

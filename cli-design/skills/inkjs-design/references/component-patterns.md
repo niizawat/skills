@@ -1,53 +1,53 @@
-# コンポーネント設計パターン
+# Component Design Patterns
 
-## 目次
+## Table of Contents
 
-1. [ディレクトリ構造](#ディレクトリ構造)
-2. [コンポーネント分類](#コンポーネント分類)
-3. [3層レイアウト](#3層レイアウト)
-4. [React.memo最適化](#reactmemo最適化)
-5. [制御/非制御モード](#制御非制御モード)
+1. [Directory Structure](#directory-structure)
+2. [Component Classification](#component-classification)
+3. [Three-Layer Layout](#three-layer-layout)
+4. [React.memo Optimization](#reactmemo-optimization)
+5. [Controlled/Uncontrolled Mode](#controlleduncontrolled-mode)
 
-## ディレクトリ構造
+## Directory Structure
 
 ```
 src/cli/ui/
 ├── components/
-│   ├── App.tsx              # ルートコンポーネント（スクリーン管理）
-│   ├── common/              # 汎用コンポーネント
-│   │   ├── Select.tsx       # 選択リスト
-│   │   ├── Input.tsx        # テキスト入力
-│   │   ├── Confirm.tsx      # Yes/No確認
+│   ├── App.tsx              # Root component (screen management)
+│   ├── common/              # Generic components
+│   │   ├── Select.tsx       # Selection list
+│   │   ├── Input.tsx        # Text input
+│   │   ├── Confirm.tsx      # Yes/No confirmation
 │   │   ├── LoadingIndicator.tsx
 │   │   └── ErrorBoundary.tsx
-│   ├── parts/               # UI部品
+│   ├── parts/               # UI parts
 │   │   ├── Header.tsx
 │   │   ├── Footer.tsx
 │   │   ├── ProgressBar.tsx
 │   │   ├── Stats.tsx
 │   │   └── ScrollableList.tsx
-│   └── screens/             # 画面コンポーネント
+│   └── screens/             # Screen components
 │       ├── BranchListScreen.tsx
 │       ├── ModelSelectorScreen.tsx
 │       └── BranchCreatorScreen.tsx
-├── hooks/                   # カスタムフック
-├── utils/                   # ユーティリティ関数
-├── types.ts                 # 型定義
-└── __tests__/               # テスト
+├── hooks/                   # Custom hooks
+├── utils/                   # Utility functions
+├── types.ts                 # Type definitions
+└── __tests__/               # Tests
 ```
 
-## コンポーネント分類
+## Component Classification
 
-### Screen（画面）
+### Screen
 
-完全な画面を表すコンポーネント。
+Components representing complete screens.
 
-**責務:**
-- `useInput`でキーボード入力を処理
-- Header/Content/Footerの3層レイアウト
-- 画面固有のビジネスロジック
+**Responsibilities:**
+- Handle keyboard input with `useInput`
+- Three-layer layout with Header/Content/Footer
+- Screen-specific business logic
 
-**命名:** `<概念>Screen.tsx`
+**Naming:** `<Concept>Screen.tsx`
 
 ```typescript
 interface BranchListScreenProps {
@@ -96,16 +96,16 @@ export function BranchListScreen({
 }
 ```
 
-### Part（部品）
+### Part
 
-再利用可能なUI部品。状態を持たない純粋コンポーネント。
+Reusable UI parts. Pure components without state.
 
-**責務:**
-- 表示のみ
-- `React.memo`で最適化
-- propsからすべてのデータを受け取る
+**Responsibilities:**
+- Display only
+- Optimize with `React.memo`
+- Receive all data from props
 
-**命名:** `<機能>.tsx`
+**Naming:** `<Feature>.tsx`
 
 ```typescript
 interface HeaderProps {
@@ -126,20 +126,20 @@ export const Header = React.memo(function Header({
 });
 ```
 
-### Common（共通）
+### Common
 
-基本的な入力コンポーネント。
+Basic input components.
 
-**責務:**
-- 制御/非制御両モードをサポート
-- 汎用的なインターフェース
-- 他のプロジェクトでも再利用可能
+**Responsibilities:**
+- Support both controlled and uncontrolled modes
+- Generic interface
+- Reusable in other projects
 
-**命名:** `<基本型>.tsx`
+**Naming:** `<BasicType>.tsx`
 
-## 3層レイアウト
+## Three-Layer Layout
 
-標準的な画面レイアウトパターン。
+Standard screen layout pattern.
 
 ```typescript
 export function StandardScreen({ children }: PropsWithChildren) {
@@ -147,35 +147,35 @@ export function StandardScreen({ children }: PropsWithChildren) {
 
   return (
     <Box flexDirection="column" height={rows}>
-      {/* Layer 1: Header - 固定高さ */}
+      {/* Layer 1: Header - fixed height */}
       <Header title="App Title" />
 
-      {/* Layer 2: Content - flexGrow で残りの高さを埋める */}
+      {/* Layer 2: Content - fill remaining height with flexGrow */}
       <Box flexDirection="column" flexGrow={1}>
         {children}
       </Box>
 
-      {/* Layer 3: Footer - 固定高さ */}
+      {/* Layer 3: Footer - fixed height */}
       <Footer actions={footerActions} />
     </Box>
   );
 }
 ```
 
-### 動的高さ計算
+### Dynamic Height Calculation
 
 ```typescript
 const { rows } = useTerminalSize();
 
-// 固定部分の行数を計算
-const headerLines = 2;    // ボーダー + タイトル
-const filterLines = 1;    // フィルター入力
-const statsLines = 1;     // 統計情報
-const footerLines = 1;    // フッター
+// Calculate fixed portion line count
+const headerLines = 2;    // Border + title
+const filterLines = 1;    // Filter input
+const statsLines = 1;     // Statistics info
+const footerLines = 1;    // Footer
 
 const fixedLines = headerLines + filterLines + statsLines + footerLines;
 const contentHeight = rows - fixedLines;
-const listLimit = Math.max(5, contentHeight);  // 最低5行は確保
+const listLimit = Math.max(5, contentHeight);  // Ensure minimum 5 lines
 
 return (
   <Select
@@ -186,9 +186,9 @@ return (
 );
 ```
 
-## React.memo最適化
+## React.memo Optimization
 
-### 基本パターン
+### Basic Pattern
 
 ```typescript
 export const Header = React.memo(function Header(props: HeaderProps) {
@@ -196,18 +196,18 @@ export const Header = React.memo(function Header(props: HeaderProps) {
 });
 ```
 
-### カスタム比較関数
+### Custom Comparison Function
 
-> **重要**: カスタム比較関数を使用する場合、コールバックprops（`onSelect`など）の参照が安定していることが前提です。親コンポーネントで`useCallback`を使用してコールバックをメモ化してください。
+> **Important**: When using custom comparison functions, it's assumed that callback props (like `onSelect`) have stable references. Use `useCallback` in parent components to memoize callbacks.
 
-配列の参照ではなくコンテンツで比較する場合:
+For comparing array contents rather than references:
 
 ```typescript
 function arePropsEqual<T extends SelectItem>(
   prevProps: SelectProps<T>,
   nextProps: SelectProps<T>,
 ): boolean {
-  // 単純な値の比較
+  // Simple value comparison
   if (
     prevProps.limit !== nextProps.limit ||
     prevProps.disabled !== nextProps.disabled ||
@@ -216,12 +216,12 @@ function arePropsEqual<T extends SelectItem>(
     return false;
   }
 
-  // 配列の長さを比較
+  // Compare array length
   if (prevProps.items.length !== nextProps.items.length) {
     return false;
   }
 
-  // 配列の内容を比較
+  // Compare array contents
   for (let i = 0; i < prevProps.items.length; i++) {
     const prevItem = prevProps.items[i];
     const nextItem = nextProps.items[i];
@@ -242,17 +242,17 @@ export const Select = React.memo(
 ) as typeof SelectComponent;
 ```
 
-## 制御/非制御モード
+## Controlled/Uncontrolled Mode
 
-Selectなどのコンポーネントで、親から状態を制御できるようにする。
+Enable parent control of state in components like Select.
 
 ```typescript
 interface SelectProps<T> {
   items: T[];
   onSelect: (item: T) => void;
-  // 非制御モード用
+  // For uncontrolled mode
   initialIndex?: number;
-  // 制御モード用
+  // For controlled mode
   selectedIndex?: number;
   onSelectedIndexChange?: (index: number) => void;
 }
@@ -264,17 +264,17 @@ function SelectComponent<T>({
   selectedIndex: externalSelectedIndex,
   onSelectedIndexChange,
 }: SelectProps<T>) {
-  // 内部状態（非制御モード用）
+  // Internal state (for uncontrolled mode)
   const [internalSelectedIndex, setInternalSelectedIndex] =
     useState(initialIndex);
 
-  // 制御モードか非制御モードかを判定
+  // Determine controlled vs uncontrolled mode
   const isControlled = externalSelectedIndex !== undefined;
   const selectedIndex = isControlled
     ? externalSelectedIndex
     : internalSelectedIndex;
 
-  // 統一された更新関数
+  // Unified update function
   const updateSelectedIndex = (
     value: number | ((prev: number) => number)
   ) => {
@@ -282,12 +282,12 @@ function SelectComponent<T>({
       ? value(selectedIndex)
       : value;
 
-    // 非制御モードの場合は内部状態を更新
+    // Update internal state in uncontrolled mode
     if (!isControlled) {
       setInternalSelectedIndex(newIndex);
     }
 
-    // コールバックがあれば呼び出し
+    // Call callback if provided
     if (onSelectedIndexChange) {
       onSelectedIndexChange(newIndex);
     }
@@ -297,17 +297,17 @@ function SelectComponent<T>({
 }
 ```
 
-## ループなしナビゲーション
+## Non-Looping Navigation
 
-リストの端で止まる（ループしない）パターン:
+Pattern where list stops at edges (no looping):
 
 ```typescript
 useInput((input, key) => {
   if (key.upArrow || input === "k") {
-    // 上に移動（0で止まる）
+    // Move up (stop at 0)
     updateSelectedIndex((current) => Math.max(0, current - 1));
   } else if (key.downArrow || input === "j") {
-    // 下に移動（最後で止まる）
+    // Move down (stop at end)
     updateSelectedIndex((current) =>
       Math.min(items.length - 1, current + 1)
     );
@@ -315,11 +315,11 @@ useInput((input, key) => {
 });
 ```
 
-## ErrorBoundaryパターン
+## ErrorBoundary Pattern
 
-> **注**: ErrorBoundaryはReactの制約上、クラスコンポーネントでのみ実装可能です。これは「関数コンポーネント + フック」の原則の唯一の例外です。
+> **Note**: Due to React constraints, ErrorBoundary can only be implemented as a class component. This is the only exception to the "functional components + hooks" principle.
 
-クラスコンポーネントで実装（フックでは不可）:
+Implementation with class component (not possible with hooks):
 
 ```typescript
 interface Props {
