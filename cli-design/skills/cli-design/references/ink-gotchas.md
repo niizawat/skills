@@ -10,6 +10,7 @@
 6. [レイアウト崩れ](#6-レイアウト崩れ)
 7. [console.log干渉](#7-consolelog干渉)
 8. [Inkの色型エラー](#8-inkの色型エラー)
+9. [描画のチラツキ問題](#9-描画のチラツキ問題)
 
 ## 1. アイコン/絵文字の幅問題
 
@@ -314,3 +315,102 @@ const selectedColor = "cyan" as const;
 import chalk from "chalk";
 <Text>{chalk.cyan("Selected")}</Text>
 ```
+
+## 9. 描画のチラツキ問題
+
+### 問題
+
+リスト表示でカーソル移動（上下キー）時に画面がチラつく。
+特にスピナーアニメーション中に顕著になる。
+
+### 原因
+
+1. **Reactの再レンダリング連鎖**: state変更で全コンポーネントが再レンダリングされる
+2. **コンポーネントのmemo化不足**: 親の更新が子コンポーネントに伝播する
+3. **useCallbackの依存配列問題**: 頻繁に更新される値（スピナーフレームなど）が含まれると関数が再生成される
+4. **スピナー更新（120ms毎）**: 全行が再描画される
+
+### 解決策
+
+**1. コンポーネントのmemo化**
+
+```typescript
+// 画面全体をmemo化して親からの不要な再レンダリングを防止
+export const MyScreen = React.memo(function MyScreen({
+  items,
+  onSelect,
+}: MyScreenProps) {
+  // ...
+});
+```
+
+**2. renderオプションでpatchConsoleを無効化**
+
+```typescript
+import { render } from "ink";
+
+render(<App />, {
+  stdin: process.stdin,
+  stdout: process.stdout,
+  stderr: process.stderr,
+  patchConsole: false,  // console.logがUIに影響しないように
+});
+```
+
+**3. スピナー依存の分離**
+
+useCallbackの依存配列からスピナーフレームを除去し、
+アニメーションが必要な場所では静的アイコンを使用する。
+
+```typescript
+// Bad: spinnerFrameが依存配列にあると120ms毎に関数が再生成される
+const renderRow = useCallback(
+  (item) => {
+    const icon = item.isSpinning ? spinnerFrame : item.icon;
+    return <Text>{icon} {item.name}</Text>;
+  },
+  [spinnerFrame]  // ← これが問題
+);
+
+// Good: 静的アイコンを使用してspinnerFrame依存を除去
+const renderRow = useCallback(
+  (item) => {
+    // スピナー中は静的な最初のフレーム "⠋" を使用
+    const icon = item.isSpinning ? "⠋" : item.icon;
+    return <Text>{icon} {item.name}</Text>;
+  },
+  []  // ← 依存なし、再生成されない
+);
+```
+
+**4. 行ごとのコンポーネント化（より根本的な解決）**
+
+各行を個別のmemo化されたコンポーネントにすることで、
+必要な行だけが再レンダリングされる。
+
+```typescript
+const RowComponent = React.memo(function RowComponent({
+  item,
+  isSelected,
+}: RowProps) {
+  // スピナーが必要な行だけが内部でuseSpinnerFrameを使用
+  const spinnerFrame = useSpinnerFrame(item.isSpinning);
+
+  return (
+    <Box>
+      <Text>{item.isSpinning ? spinnerFrame : item.icon}</Text>
+      <Text>{item.name}</Text>
+    </Box>
+  );
+}, (prev, next) => {
+  // カスタム比較関数で必要な場合のみ再レンダリング
+  return prev.isSelected === next.isSelected &&
+         prev.item.isSpinning === next.item.isSpinning;
+});
+```
+
+### 優先順位
+
+1. **コンポーネントのmemo化** - 最も簡単で効果的
+2. **スピナー依存の分離** - 根本的な解決
+3. **patchConsole: false** - 副次的な効果
