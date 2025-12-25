@@ -31,6 +31,16 @@ Spec Kit workflow skill with:
 - **Specification authoring**: spec.md → plan.md → tasks.md flow
 - **TDD alignment**: Test-first requirements capture
 
+### drawio
+
+Draw.io diagram creation and editing skill with:
+
+- **XML structure**: Direct .drawio file manipulation
+- **Shape support**: Rectangle, ellipse, diamond, text, and connectors
+- **Japanese fonts**: Noto Sans JP with proper sizing
+- **Export options**: PNG, SVG, PDF via drawio-export CLI
+- **Style guide**: Color palette, layout rules, and best practices
+
 ## Installation
 
 ### Add Marketplace
@@ -57,12 +67,18 @@ Or:
 /plugin install requirements-spec-kit@akiojin-skills
 ```
 
+Or:
+
+```bash
+/plugin install drawio@akiojin-skills
+```
+
 Or interactively:
 
 ```bash
 /plugin
 # Select "Browse Plugins"
-# Choose cli-design, unity-development, or requirements-spec-kit
+# Choose cli-design, unity-development, requirements-spec-kit, or drawio
 ```
 
 ## Usage
@@ -94,6 +110,15 @@ Automatically triggered when:
 - Creating or updating requirements specs
 - Drafting specifications (specification/spec doc authoring)
 - Running Spec Kit workflows (specify/clarify/plan/tasks)
+
+### drawio
+
+Automatically triggered when:
+
+- Creating flowcharts, architecture diagrams, or sequence diagrams
+- Editing .drawio files in XML format
+- Setting up diagram styling and fonts
+- Exporting diagrams to PNG, SVG, or PDF
 
 ## License
 

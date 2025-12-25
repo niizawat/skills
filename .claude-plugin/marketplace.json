@@ -35,6 +35,14 @@
       "version": "0.1.0",
       "category": "development",
       "keywords": ["github", "pr", "ci", "review", "conflict", "actions"]
+    },
+    {
+      "name": "drawio",
+      "source": "./drawio",
+      "description": "Draw.io diagram creation and editing skill. Handles XML structure, styling, fonts, arrows, connectors, and PNG export.",
+      "version": "0.1.0",
+      "category": "development",
+      "keywords": ["draw.io", "diagram", "flowchart", "architecture", "xml"]
     }
   ]
 }
