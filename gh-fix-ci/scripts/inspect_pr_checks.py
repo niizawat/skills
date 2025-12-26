@@ -291,14 +291,32 @@ def check_conflicts(pr_value: str, repo_root: Path) -> dict[str, Any]:
     except json.JSONDecodeError:
         return {"error": "Failed to parse merge state JSON", "hasConflicts": False}
 
-    mergeable = data.get("mergeable", "UNKNOWN")
+    mergeable_raw = data.get("mergeable")
     merge_state_status = data.get("mergeStateStatus", "UNKNOWN")
 
-    has_conflicts = mergeable == "CONFLICTING" or merge_state_status == "DIRTY"
+    # Handle different return types from gh CLI:
+    # - Older versions: boolean (true/false)
+    # - Newer versions: string ("MERGEABLE", "CONFLICTING", "UNKNOWN")
+    if isinstance(mergeable_raw, bool):
+        # Older gh CLI: boolean value
+        has_conflicts = not mergeable_raw
+        mergeable_display = "CONFLICTING" if not mergeable_raw else "MERGEABLE"
+    elif isinstance(mergeable_raw, str):
+        # Newer gh CLI: string value
+        has_conflicts = mergeable_raw == "CONFLICTING"
+        mergeable_display = mergeable_raw
+    else:
+        # None or unknown type (GitHub still calculating)
+        has_conflicts = False
+        mergeable_display = "UNKNOWN"
+
+    # Also check mergeStateStatus for DIRTY state
+    if merge_state_status == "DIRTY":
+        has_conflicts = True
 
     return {
         "hasConflicts": has_conflicts,
-        "mergeable": mergeable,
+        "mergeable": mergeable_display,
         "mergeStateStatus": merge_state_status,
         "baseRefName": data.get("baseRefName", ""),
         "headRefName": data.get("headRefName", ""),
