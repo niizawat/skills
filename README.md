@@ -1,6 +1,6 @@
-# Claude Code Skills
+# Codex & Claude Code Skills
 
-A collection of Claude Code plugins and Codex skills for software development.
+A collection of skills and plugins for Codex and Claude Code.
 
 ## Available Plugins
 
