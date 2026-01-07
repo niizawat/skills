@@ -38,6 +38,22 @@
       "version": "0.1.0",
       "category": "development",
       "keywords": ["draw.io", "diagram", "flowchart", "architecture", "xml"]
+    },
+    {
+      "name": "cli-inkjs",
+      "source": "./cli-inkjs",
+      "description": "Ink.js (React for CLI) design and implementation toolkit. Covers component patterns, input handling, screen navigation, key propagation prevention, performance optimization, and common gotchas.",
+      "version": "1.0.0",
+      "category": "development",
+      "keywords": ["cli", "inkjs", "terminal", "react", "tui", "input-handling"]
+    },
+    {
+      "name": "cli-opentui",
+      "source": "./cli-opentui",
+      "description": "OpenTUI (SolidJS for CLI) design and implementation toolkit. Covers component patterns, input handling, screen navigation, key propagation prevention, mouse handling, performance optimization, and common gotchas.",
+      "version": "1.0.0",
+      "category": "development",
+      "keywords": ["cli", "opentui", "solidjs", "terminal", "tui", "input-handling"]
     }
   ]
 }
