@@ -90,7 +90,7 @@ This repo also ships packaged `.skill` files under `codex-skills/dist/`.
 
 ```bash
 # From GitHub repo/path
-scripts/install-skill-from-github.py --repo akiojin/skills --path gh-pr-create --ref main
+scripts/install-skill-from-github.py --repo akiojin/skills --path gh-pr --ref main
 ```
 
 ### Option B: Unzip .skill into $CODEX_HOME/skills
@@ -99,19 +99,19 @@ scripts/install-skill-from-github.py --repo akiojin/skills --path gh-pr-create -
 # Example (PowerShell)
 $dest = "$env:USERPROFILE\.codex\skills"
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
-Expand-Archive -Path .\codex-skills\dist\gh-pr-create.skill -DestinationPath $dest -Force
+Expand-Archive -Path .\codex-skills\dist\gh-pr.skill -DestinationPath $dest -Force
 ```
 
 ```bash
 # Example (bash)
 dest="$HOME/.codex/skills"
 mkdir -p "$dest"
-unzip -o ./codex-skills/dist/gh-pr-create.skill -d "$dest"
+unzip -o ./codex-skills/dist/gh-pr.skill -d "$dest"
 ```
 
 ### Available Codex skills
 
-- gh-pr-create
+- gh-pr
 - gh-fix-ci
 - requirements-spec-kit
 - drawio
@@ -121,7 +121,7 @@ After installation, restart Codex to load new skills.
 
 ## Usage (Codex)
 
-### gh-pr-create
+### gh-pr
 
 Use when creating or updating GitHub PRs with the gh CLI, or when you want a PR body generated from a template.
 
