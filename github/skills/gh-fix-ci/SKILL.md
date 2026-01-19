@@ -30,6 +30,7 @@ Prereq: ensure `gh` is authenticated (for example, run `gh auth login` once), th
 - `pr`: PR number or URL (optional; defaults to current branch PR)
 - `mode`: inspection mode (`checks`, `conflicts`, `reviews`, `all`)
 - `max-review-comments`: max reviewer comments to list per category
+- `required-only`: limit CI checks to required checks only (uses `gh pr checks --required`)
 - `gh` authentication for the repo host
 
 ## Quick start
@@ -49,6 +50,9 @@ python "<path-to-skill>/scripts/inspect_pr_checks.py" --repo "." --pr "<number>"
 
 # JSON output
 python "<path-to-skill>/scripts/inspect_pr_checks.py" --repo "." --pr "<number>" --json
+
+# Required checks only (if gh supports --required)
+python "<path-to-skill>/scripts/inspect_pr_checks.py" --repo "." --pr "<number>" --mode checks --required-only
 
 # Limit review comment output
 python "<path-to-skill>/scripts/inspect_pr_checks.py" --repo "." --pr "<number>" --max-review-comments 30
@@ -87,6 +91,7 @@ python "<path-to-skill>/scripts/inspect_pr_checks.py" --repo "." --pr "<number>"
 
    **Checks Mode (`--mode checks`):**
    - Run bundled script to inspect failing CI checks.
+   - Add `--required-only` to limit output to required checks when supported.
    - Fetch GitHub Actions logs and extract failure snippets.
    - For external checks (Buildkite, etc.), report URL only.
 
@@ -130,6 +135,7 @@ Comprehensive PR inspection tool. Exits non-zero when issues remain.
 | `--max-lines` | 160 | Max lines for log snippets |
 | `--context` | 30 | Context lines around failure markers |
 | `--max-review-comments` | 50 | Max reviewer comments to list per category |
+| `--required-only` | false | Limit CI checks to required checks only |
 | `--json` | false | Emit JSON output |
 | `--resolve-threads` | false | Resolve unresolved review threads |
 | `--add-comment` | (none) | Add a comment to the PR |

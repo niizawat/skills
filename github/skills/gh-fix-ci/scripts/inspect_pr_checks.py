@@ -111,6 +111,11 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_MAX_REVIEW_COMMENTS,
         help="Maximum number of reviewer comments to list per category.",
     )
+    parser.add_argument(
+        "--required-only",
+        action="store_true",
+        help="Limit CI checks to required checks only (uses gh pr checks --required).",
+    )
     parser.add_argument("--json", action="store_true", help="Emit JSON instead of text output.")
     parser.add_argument(
         "--resolve-threads",
@@ -222,7 +227,7 @@ def main() -> int:
 
     # CI checks
     if args.mode in ("checks", "all"):
-        checks = fetch_checks(pr_value, repo_root)
+        checks, checks_note = fetch_checks(pr_value, repo_root, required_only=args.required_only)
         if checks is not None:
             failing = [c for c in checks if is_failing(c)]
             if failing:
@@ -243,6 +248,10 @@ def main() -> int:
         else:
             results["ciFailures"] = None
             results["ciError"] = "Failed to fetch CI checks"
+        if checks_note:
+            results["checksNote"] = checks_note
+        if args.required_only:
+            results["checksRequiredOnly"] = True
 
     # Output
     if args.json:
@@ -746,49 +755,69 @@ def add_pr_comment(pr_value: str, body: str, repo_root: Path) -> bool:
 # CI checks (existing functionality)
 # =============================================================================
 
-def fetch_checks(pr_value: str, repo_root: Path) -> list[dict[str, Any]] | None:
+def fetch_checks(
+    pr_value: str,
+    repo_root: Path,
+    required_only: bool,
+) -> tuple[list[dict[str, Any]] | None, str]:
     primary_fields = ["name", "state", "conclusion", "detailsUrl", "startedAt", "completedAt"]
-    result = run_gh_command(
-        ["pr", "checks", pr_value, "--json", ",".join(primary_fields)],
-        cwd=repo_root,
-    )
+    note = ""
+    use_required = required_only
+
+    def run_checks(fields: Sequence[str], include_required: bool) -> GhResult:
+        args = ["pr", "checks", pr_value]
+        if include_required:
+            args.append("--required")
+        args.extend(["--json", ",".join(fields)])
+        return run_gh_command(args, cwd=repo_root)
+
+    result = run_checks(primary_fields, use_required)
     if result.returncode != 0:
         message = "\n".join(filter(None, [result.stderr, result.stdout])).strip()
-        available_fields = parse_available_fields(message)
-        if available_fields:
-            fallback_fields = [
-                "name",
-                "state",
-                "bucket",
-                "link",
-                "startedAt",
-                "completedAt",
-                "workflow",
-            ]
-            selected_fields = [field for field in fallback_fields if field in available_fields]
-            if not selected_fields:
-                print("Error: no usable fields available for gh pr checks.", file=sys.stderr)
-                return None
-            result = run_gh_command(
-                ["pr", "checks", pr_value, "--json", ",".join(selected_fields)],
-                cwd=repo_root,
-            )
-            if result.returncode != 0:
-                message = (result.stderr or result.stdout or "").strip()
+        if use_required and required_flag_unsupported(message):
+            use_required = False
+            note = "gh pr checks --required not supported; showing all checks instead."
+            result = run_checks(primary_fields, use_required)
+            message = "\n".join(filter(None, [result.stderr, result.stdout])).strip()
+        if result.returncode != 0:
+            available_fields = parse_available_fields(message)
+            if available_fields:
+                fallback_fields = [
+                    "name",
+                    "state",
+                    "bucket",
+                    "link",
+                    "startedAt",
+                    "completedAt",
+                    "workflow",
+                ]
+                selected_fields = [field for field in fallback_fields if field in available_fields]
+                if not selected_fields:
+                    print("Error: no usable fields available for gh pr checks.", file=sys.stderr)
+                    return None, note
+                result = run_checks(selected_fields, use_required)
+                if result.returncode != 0 and use_required:
+                    message = "\n".join(filter(None, [result.stderr, result.stdout])).strip()
+                    if required_flag_unsupported(message):
+                        use_required = False
+                        note = "gh pr checks --required not supported; showing all checks instead."
+                        result = run_checks(selected_fields, use_required)
+                if result.returncode != 0:
+                    message = (result.stderr or result.stdout or "").strip()
+                    print(message or "Error: gh pr checks failed.", file=sys.stderr)
+                    return None, note
+            else:
                 print(message or "Error: gh pr checks failed.", file=sys.stderr)
-                return None
-        else:
-            print(message or "Error: gh pr checks failed.", file=sys.stderr)
-            return None
+                return None, note
     try:
         data = json.loads(result.stdout or "[]")
     except json.JSONDecodeError:
         print("Error: unable to parse checks JSON.", file=sys.stderr)
-        return None
+        return None, note
     if not isinstance(data, list):
         print("Error: unexpected checks JSON shape.", file=sys.stderr)
-        return None
-    return data
+        return None, note
+    return data, note
 
 
 def is_failing(check: dict[str, Any]) -> bool:
@@ -976,6 +1005,13 @@ def parse_available_fields(message: str) -> list[str]:
             continue
         fields.append(field)
     return fields
+
+
+def required_flag_unsupported(message: str) -> bool:
+    lowered = message.lower()
+    if "--required" not in lowered:
+        return False
+    return "unknown" in lowered or "invalid" in lowered or "flag" in lowered or "option" in lowered
 
 
 def is_log_pending_message(message: str) -> bool:
@@ -1178,6 +1214,11 @@ def render_comprehensive_results(results: dict[str, Any]) -> None:
     if ci_failures is not None:
         print("\nCI FAILURES")
         print("-" * 60)
+        if results.get("checksRequiredOnly"):
+            print("Checks mode: required only")
+        checks_note = results.get("checksNote")
+        if checks_note:
+            print(f"Checks note: {checks_note}")
         if ci_failures:
             render_ci_results(ci_failures)
         else:
