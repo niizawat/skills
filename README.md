@@ -210,3 +210,32 @@ Automatically triggered when:
 ## License
 
 MIT
+
+## Add a New Skill
+
+### 1) Create the skill folder
+
+- **Codex skill**: create a folder at repo root with `SKILL.md` (YAML frontmatter required).
+- **Claude Code plugin**: create a plugin folder at repo root. If it contains multiple skills, place them under `plugins/<plugin>/skills/<skill-name>/SKILL.md`.
+
+### 2) Register for Claude Code (plugin)
+
+Add a new entry to `.claude-plugin/marketplace.json`:
+
+- `name`, `source`, `description`, `version`, `category`, `keywords`
+
+### 3) Package for Codex
+
+Package the skill into `codex-skills/dist/`:
+
+```bash
+export PYTHONUTF8=1
+codex_home="${CODEX_HOME:-$HOME/.codex}"
+python "$codex_home/skills/.system/skill-creator/scripts/package_skill.py" \
+  "<repo-root>/<skill-folder>" \
+  "<repo-root>/codex-skills/dist"
+```
+
+### 4) Update this README
+
+- Add the skill under **Available Plugins**, **Available Codex skills**, and the **Usage** sections.
