@@ -18,7 +18,7 @@
     {
       "name": "speckit",
       "source": "./speckit",
-      "description": "Spec Kit skills: requirements-spec-kit and spec-kit-update (requirements workflow + upstream update).",
+      "description": "Spec Kit skills: speckit-require and speckit-update (requirements workflow + upstream update).",
       "version": "0.1.0",
       "category": "development",
       "keywords": ["spec-kit", "requirements", "specification", "update", "workflow", "tdd"]

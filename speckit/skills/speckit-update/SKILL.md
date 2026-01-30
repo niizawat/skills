@@ -1,5 +1,5 @@
 ---
-name: spec-kit-update
+name: speckit-update
 description: GitHub Spec Kit のベースバージョン更新やテンプレート/スクリプト同期を行うための手順。Spec Kitの更新、上流リリースとの差分適用、templates/commands/scriptsの取り込み、ローカル運用（日本語化・ブランチ非操作・SPEC-[UUID8桁]）の維持が必要なときに使用する。
 ---
 

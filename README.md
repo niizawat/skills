@@ -112,8 +112,8 @@ unzip -o ./codex-skills/dist/gh-pr.skill -d "$dest"
 
 - gh-pr
 - gh-fix-ci
-- spec-kit-require
-- spec-kit-update
+- speckit-require
+- speckit-update
 - drawio
 - inkjs-design
 
@@ -129,11 +129,11 @@ Use when creating or updating GitHub PRs with the gh CLI, or when you want a PR 
 
 Use when debugging failing GitHub Actions checks for a PR and you want a fix plan + code changes.
 
-### spec-kit-require
+### speckit-require
 
 Use when creating or updating requirement specs with Spec Kit (specify/clarify/plan/tasks flow).
 
-### spec-kit-update
+### speckit-update
 
 Use when updating GitHub Spec Kit versions and syncing templates/scripts while preserving local rules.
 
@@ -167,7 +167,7 @@ Automatically triggered when:
 - Configuring VContainer DI
 - Implementing UniTask async methods
 
-### spec-kit-require
+### speckit-require
 
 Automatically triggered when:
 
@@ -175,7 +175,7 @@ Automatically triggered when:
 - Drafting specifications (specification/spec doc authoring)
 - Running Spec Kit workflows (specify/clarify/plan/tasks)
 
-### spec-kit-update
+### speckit-update
 
 Automatically triggered when:
 
@@ -208,9 +208,9 @@ Example (plugin with multiple skills):
 ```
 speckit/
 └── skills/
-    ├── spec-kit-require/
+    ├── speckit-require/
     │   └── SKILL.md
-    └── spec-kit-update/
+    └── speckit-update/
         └── SKILL.md
 ```
 
@@ -251,7 +251,7 @@ Example (single skill package):
 export PYTHONUTF8=1
 codex_home="${CODEX_HOME:-$HOME/.codex}"
 python "$codex_home/skills/.system/skill-creator/scripts/package_skill.py" \
-  "$PWD/speckit/skills/spec-kit-update" \
+  "$PWD/speckit/skills/speckit-update" \
   "$PWD/codex-skills/dist"
 ```
 
@@ -270,7 +270,7 @@ Create only the directories you need under the skill folder:
 Example:
 
 ```
-speckit/skills/spec-kit-update/
+speckit/skills/speckit-update/
 ├── SKILL.md
 ├── scripts/
 │   └── sync-upstream.sh
