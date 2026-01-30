@@ -218,11 +218,31 @@ MIT
 - **Codex skill**: create a folder at repo root with `SKILL.md` (YAML frontmatter required).
 - **Claude Code plugin**: create a plugin folder at repo root. If it contains multiple skills, place them under `plugins/<plugin>/skills/<skill-name>/SKILL.md`.
 
+Example (single skill):
+
+```
+spec-kit-update/
+└── SKILL.md
+```
+
 ### 2) Register for Claude Code (plugin)
 
 Add a new entry to `.claude-plugin/marketplace.json`:
 
 - `name`, `source`, `description`, `version`, `category`, `keywords`
+
+Example entry:
+
+```json
+{
+  "name": "spec-kit-update",
+  "source": "./spec-kit-update",
+  "description": "Update GitHub Spec Kit base version and sync templates/scripts while preserving local rules.",
+  "version": "0.1.0",
+  "category": "development",
+  "keywords": ["spec-kit", "update", "upgrade", "templates", "scripts", "workflow"]
+}
+```
 
 ### 3) Package for Codex
 
@@ -234,6 +254,16 @@ codex_home="${CODEX_HOME:-$HOME/.codex}"
 python "$codex_home/skills/.system/skill-creator/scripts/package_skill.py" \
   "<repo-root>/<skill-folder>" \
   "<repo-root>/codex-skills/dist"
+```
+
+Example:
+
+```bash
+export PYTHONUTF8=1
+codex_home="${CODEX_HOME:-$HOME/.codex}"
+python "$codex_home/skills/.system/skill-creator/scripts/package_skill.py" \
+  "$PWD/spec-kit-update" \
+  "$PWD/codex-skills/dist"
 ```
 
 ### 4) Update this README
