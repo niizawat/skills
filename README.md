@@ -30,6 +30,13 @@ Spec Kit skills (plugin) with:
 - **Requirements workflow**: spec.md → plan.md → tasks.md flow
 - **Upstream update**: GitHub Spec Kit version sync
 
+### github
+
+GitHub workflow skills with:
+
+- **PR automation**: gh-pr workflow and PR body templates
+- **CI diagnostics**: gh-fix-ci workflow and inspection scripts
+
 ### drawio
 
 Draw.io diagram creation and editing skill with:
@@ -69,6 +76,12 @@ Or:
 Or:
 
 ```bash
+/plugin install github@akiojin-skills
+```
+
+Or:
+
+```bash
 /plugin install drawio@akiojin-skills
 ```
 
@@ -77,7 +90,7 @@ Or interactively:
 ```bash
 /plugin
 # Select "Browse Plugins"
-# Choose cli-design, unity-development, speckit, or drawio
+# Choose cli-design, unity-development, speckit, github, or drawio
 ```
 
 ## Installation (Codex)
@@ -182,6 +195,18 @@ Automatically triggered when:
 - Updating GitHub Spec Kit versions in a repo
 - Syncing Spec Kit templates/commands/scripts from upstream
 - Preserving local Spec Kit rules (Japanese, no branch ops, SPEC-UUID)
+
+### github
+
+Slash commands:
+
+- `/github:gh-pr`
+- `/github:gh-fix-ci`
+
+### speckit (slash commands)
+
+- `/speckit:speckit-require`
+- `/speckit:speckit-update`
 
 ### drawio
 
