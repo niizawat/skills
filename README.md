@@ -269,3 +269,25 @@ python "$codex_home/skills/.system/skill-creator/scripts/package_skill.py" \
 ### 4) Update this README
 
 - Add the skill under **Available Plugins**, **Available Codex skills**, and the **Usage** sections.
+
+### 5) Add resources (scripts / references / assets)
+
+Create only the directories you need under the skill folder:
+
+- `scripts/` for executable automation (bash/python/etc.)
+- `references/` for docs you want the model to read on demand
+- `assets/` for templates or files to copy into outputs
+
+Example:
+
+```
+spec-kit-update/
+├── SKILL.md
+├── scripts/
+│   └── sync-upstream.sh
+├── references/
+│   └── upstream-diff-checklist.md
+└── assets/
+    └── templates/
+        └── spec-template.md
+```
