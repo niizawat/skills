@@ -23,21 +23,12 @@ Unity C# development skill with:
 - **UniTask**: Async processing patterns
 - **Fail-Fast principle**: No null-check defensive coding
 
-### requirements-spec-kit
+### speckit
 
-Spec Kit workflow skill with:
+Spec Kit skills (plugin) with:
 
-- **Requirements definition**: New or updated requirement specs
-- **Specification authoring**: spec.md → plan.md → tasks.md flow
-- **TDD alignment**: Test-first requirements capture
-
-### spec-kit-update
-
-Spec Kit update skill with:
-
-- **Upstream sync**: GitHub Spec Kit releases/tags comparison
-- **Local constraints**: Japanese templates, no branch ops, SPEC-UUID format
-- **Diff workflow**: templates/commands/scripts update checklist
+- **Requirements workflow**: spec.md → plan.md → tasks.md flow
+- **Upstream update**: GitHub Spec Kit version sync
 
 ### drawio
 
@@ -72,13 +63,7 @@ Or:
 Or:
 
 ```bash
-/plugin install requirements-spec-kit@akiojin-skills
-```
-
-Or:
-
-```bash
-/plugin install spec-kit-update@akiojin-skills
+/plugin install speckit@akiojin-skills
 ```
 
 Or:
@@ -92,7 +77,7 @@ Or interactively:
 ```bash
 /plugin
 # Select "Browse Plugins"
-# Choose cli-design, unity-development, requirements-spec-kit, spec-kit-update, or drawio
+# Choose cli-design, unity-development, speckit, or drawio
 ```
 
 ## Installation (Codex)
@@ -127,7 +112,7 @@ unzip -o ./codex-skills/dist/gh-pr.skill -d "$dest"
 
 - gh-pr
 - gh-fix-ci
-- requirements-spec-kit
+- spec-kit-require
 - spec-kit-update
 - drawio
 - inkjs-design
@@ -144,7 +129,7 @@ Use when creating or updating GitHub PRs with the gh CLI, or when you want a PR 
 
 Use when debugging failing GitHub Actions checks for a PR and you want a fix plan + code changes.
 
-### requirements-spec-kit
+### spec-kit-require
 
 Use when creating or updating requirement specs with Spec Kit (specify/clarify/plan/tasks flow).
 
@@ -182,7 +167,7 @@ Automatically triggered when:
 - Configuring VContainer DI
 - Implementing UniTask async methods
 
-### requirements-spec-kit
+### spec-kit-require
 
 Automatically triggered when:
 
@@ -216,13 +201,17 @@ MIT
 ### 1) Create the skill folder
 
 - **Codex skill**: create a folder at repo root with `SKILL.md` (YAML frontmatter required).
-- **Claude Code plugin**: create a plugin folder at repo root. If it contains multiple skills, place them under `plugins/<plugin>/skills/<skill-name>/SKILL.md`.
+- **Claude Code plugin**: create a plugin folder at repo root. If it contains multiple skills, place them under `<plugin>/skills/<skill-name>/SKILL.md`.
 
-Example (single skill):
+Example (plugin with multiple skills):
 
 ```
-spec-kit-update/
-└── SKILL.md
+speckit/
+└── skills/
+    ├── spec-kit-require/
+    │   └── SKILL.md
+    └── spec-kit-update/
+        └── SKILL.md
 ```
 
 ### 2) Register for Claude Code (plugin)
@@ -231,16 +220,16 @@ Add a new entry to `.claude-plugin/marketplace.json`:
 
 - `name`, `source`, `description`, `version`, `category`, `keywords`
 
-Example entry:
+Example entry (plugin):
 
 ```json
 {
-  "name": "spec-kit-update",
-  "source": "./spec-kit-update",
-  "description": "Update GitHub Spec Kit base version and sync templates/scripts while preserving local rules.",
+  "name": "speckit",
+  "source": "./speckit",
+  "description": "Spec Kit skills: requirements workflow + upstream update.",
   "version": "0.1.0",
   "category": "development",
-  "keywords": ["spec-kit", "update", "upgrade", "templates", "scripts", "workflow"]
+  "keywords": ["spec-kit", "requirements", "specification", "update", "workflow", "tdd"]
 }
 ```
 
@@ -256,13 +245,13 @@ python "$codex_home/skills/.system/skill-creator/scripts/package_skill.py" \
   "<repo-root>/codex-skills/dist"
 ```
 
-Example:
+Example (single skill package):
 
 ```bash
 export PYTHONUTF8=1
 codex_home="${CODEX_HOME:-$HOME/.codex}"
 python "$codex_home/skills/.system/skill-creator/scripts/package_skill.py" \
-  "$PWD/spec-kit-update" \
+  "$PWD/speckit/skills/spec-kit-update" \
   "$PWD/codex-skills/dist"
 ```
 
@@ -281,7 +270,7 @@ Create only the directories you need under the skill folder:
 Example:
 
 ```
-spec-kit-update/
+speckit/skills/spec-kit-update/
 ├── SKILL.md
 ├── scripts/
 │   └── sync-upstream.sh
