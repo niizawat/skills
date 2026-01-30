@@ -24,6 +24,14 @@
       "keywords": ["requirements", "specification", "spec", "spec-kit", "tdd", "planning"]
     },
     {
+      "name": "spec-kit-update",
+      "source": "./spec-kit-update",
+      "description": "Update GitHub Spec Kit base version and sync templates/scripts while preserving local rules (Japanese, no branch ops, SPEC-UUID).",
+      "version": "0.1.0",
+      "category": "development",
+      "keywords": ["spec-kit", "update", "upgrade", "templates", "scripts", "workflow"]
+    },
+    {
       "name": "github",
       "source": "./github",
       "description": "GitHub workflow skills: PR creation/update (gh-pr) and CI failure inspection/fix (gh-fix-ci)",

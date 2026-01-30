@@ -31,6 +31,14 @@ Spec Kit workflow skill with:
 - **Specification authoring**: spec.md → plan.md → tasks.md flow
 - **TDD alignment**: Test-first requirements capture
 
+### spec-kit-update
+
+Spec Kit update skill with:
+
+- **Upstream sync**: GitHub Spec Kit releases/tags comparison
+- **Local constraints**: Japanese templates, no branch ops, SPEC-UUID format
+- **Diff workflow**: templates/commands/scripts update checklist
+
 ### drawio
 
 Draw.io diagram creation and editing skill with:
@@ -70,6 +78,12 @@ Or:
 Or:
 
 ```bash
+/plugin install spec-kit-update@akiojin-skills
+```
+
+Or:
+
+```bash
 /plugin install drawio@akiojin-skills
 ```
 
@@ -78,7 +92,7 @@ Or interactively:
 ```bash
 /plugin
 # Select "Browse Plugins"
-# Choose cli-design, unity-development, requirements-spec-kit, or drawio
+# Choose cli-design, unity-development, requirements-spec-kit, spec-kit-update, or drawio
 ```
 
 ## Installation (Codex)
@@ -114,6 +128,7 @@ unzip -o ./codex-skills/dist/gh-pr.skill -d "$dest"
 - gh-pr
 - gh-fix-ci
 - requirements-spec-kit
+- spec-kit-update
 - drawio
 - inkjs-design
 
@@ -132,6 +147,10 @@ Use when debugging failing GitHub Actions checks for a PR and you want a fix pla
 ### requirements-spec-kit
 
 Use when creating or updating requirement specs with Spec Kit (specify/clarify/plan/tasks flow).
+
+### spec-kit-update
+
+Use when updating GitHub Spec Kit versions and syncing templates/scripts while preserving local rules.
 
 ### drawio
 
@@ -170,6 +189,14 @@ Automatically triggered when:
 - Creating or updating requirements specs
 - Drafting specifications (specification/spec doc authoring)
 - Running Spec Kit workflows (specify/clarify/plan/tasks)
+
+### spec-kit-update
+
+Automatically triggered when:
+
+- Updating GitHub Spec Kit versions in a repo
+- Syncing Spec Kit templates/commands/scripts from upstream
+- Preserving local Spec Kit rules (Japanese, no branch ops, SPEC-UUID)
 
 ### drawio
 
