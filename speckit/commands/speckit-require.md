@@ -16,7 +16,7 @@ Use this command to create or update requirements with Spec Kit and generate `sp
 
 ## Steps
 
-1. Load `speckit/skills/speckit-require/SKILL.md` and follow the workflow.
+1. Load `${CLAUDE_PLUGIN_ROOT}/skills/speckit-require/SKILL.md` and follow the workflow.
 2. Ensure outputs remain **日本語** and SPEC ID is **SPEC-[UUID8桁]**.
 3. Do not create or switch branches (user-managed only).
 

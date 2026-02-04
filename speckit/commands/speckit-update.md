@@ -16,7 +16,7 @@ Use this command to sync your local Spec Kit setup with upstream GitHub releases
 
 ## Steps
 
-1. Load `speckit/skills/speckit-update/SKILL.md` and follow the workflow.
+1. Load `${CLAUDE_PLUGIN_ROOT}/skills/speckit-update/SKILL.md` and follow the workflow.
 2. Preserve local constraints: **日本語**, **ブランチ非操作**, **SPEC-[UUID8桁]**.
 3. Update version references in docs after syncing.
 
